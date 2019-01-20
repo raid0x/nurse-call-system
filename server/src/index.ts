@@ -1,6 +1,8 @@
-require("dotenv").config();
+import { config } from "dotenv";
 
 import { app, server } from "./app";
+
+config();
 
 app.set("port", process.env.PORT || 3000);
 
