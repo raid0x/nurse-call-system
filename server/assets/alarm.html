@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Nurse Call Prototype</title>
+    <style>
+      html,
+      body,
+      div {
+        height: 100%;
+      }
+
+      div {
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+      }
+
+      h1 {
+        font-size: 50vh;
+        margin: 0;
+      }
+
+      .on {
+        animation: blinker 1s linear infinite;
+      }
+
+      @keyframes blinker {
+        50% {
+          opacity: 0;
+        }
+      }
+
+      .red {
+        color: red;
+      }
+
+      .green {
+        color: green;
+      }
+
+      .blue {
+        color: blue;
+      }
+    </style>
+  </head>
+  <body>
+    <div><h1 id="alarm">Alarm</h1></div>
+    <script>
+      var color = parseColor(window.location.search);
+
+      document.getElementById("alarm").classList.add(color);
+
+      const socket = new WebSocket("ws://localhost:3000");
+
+      socket.addEventListener("message", function(event) {
+        const message = event.data.split(" ");
+        const action = message[0];
+        const target = message[1];
+
+        if (action === "activate" && (target === color || target === "white")) {
+          document.getElementById("alarm").classList.add("on");
+          socket.send("activated " + color);
+        }
+
+        if (action === "deactivate") {
+          document.getElementById("alarm").classList.remove("on");
+          socket.send("deactivated " + color);
+        }
+
+        console.log("Message from the server ", event.data);
+      });
+
+      function parseColor(query) {
+        return query.split("=")[1];
+      }
+    </script>
+  </body>
+</html>

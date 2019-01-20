@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Nurse Call Prototype</title>
+    <style>
+      button {
+        height: 100px;
+        width: 100px;
+        font-weight: bold;
+        outline: none;
+      }
+
+      #red {
+        background-color: #9b2d21;
+        color: white;
+      }
+
+      #red.on {
+        background-color: #e74c3c;
+      }
+
+      #green {
+        background-color: #1e8047;
+        color: white;
+      }
+
+      #green.on {
+        background-color: #2ecc71;
+      }
+
+      #blue {
+        background-color: #20638f;
+        color: white;
+      }
+
+      #blue.on {
+        background-color: #3498db;
+      }
+
+      #white {
+        background-color: #bdc3c7;
+      }
+
+      #white.on {
+        background-color: #ecf0f1;
+      }
+
+      #disable {
+        background-color: #3d3d3d;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Call Center</h1>
+
+    <button id="red">RED</button> <button id="green">GREEN</button>
+    <button id="blue">BLUE</button> <button id="white">WHITE</button>
+    <button id="disable">DISABLE</button>
+
+    <script>
+      var active = {
+        red: false,
+        green: false,
+        blue: false
+      };
+
+      const socket = new WebSocket("ws://localhost:3000");
+
+      socket.addEventListener("message", function(event) {
+        const message = event.data.split(" ");
+        const action = message[0];
+        const color = message[1];
+
+        if (action === "activated") {
+          active[color] = true;
+          document.getElementById(color).classList.add("on");
+
+          if (active.red && active.green && active.blue) {
+            document.getElementById("white").classList.add("on");
+          }
+        }
+
+        if (action === "deactivated") {
+          active[color] = false;
+
+          document.getElementById(color).classList.remove("on");
+          document.getElementById("white").classList.remove("on");
+        }
+
+        console.log("Message from the server ", event.data);
+      });
+
+      document.getElementById("red").addEventListener("click", function() {
+        socket.send("activate red");
+      });
+
+      document.getElementById("green").addEventListener("click", function() {
+        socket.send("activate green");
+      });
+
+      document.getElementById("blue").addEventListener("click", function() {
+        socket.send("activate blue");
+      });
+
+      document.getElementById("white").addEventListener("click", function() {
+        socket.send("activate white");
+      });
+
+      document.getElementById("disable").addEventListener("click", function() {
+        socket.send("deactivate");
+      });
+    </script>
+  </body>
+</html>
