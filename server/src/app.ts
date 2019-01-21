@@ -9,6 +9,7 @@ const wss = new WebSocket.Server({ server });
 
 import { handleWebSockets } from "./controllers/webSocketController";
 
+app.use("/", express.static(path.resolve(__dirname, "../../client/dist")));
 app.use("/mock", express.static(path.resolve(__dirname, "../assets")));
 
 wss.on("connection", handleWebSockets(wss));
