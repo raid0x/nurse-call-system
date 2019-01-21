@@ -6,7 +6,8 @@
     "watch-node": "nodemon dist/index.js",
     "dev": "concurrently \"npm run watch-ts\" \"npm run watch-node\"",
     "build": "./node_modules/typescript/bin/tsc",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "deploy": "pm2 start dist/index.js"
   },
   "license": "MIT",
   "dependencies": {
