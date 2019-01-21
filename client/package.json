@@ -17,6 +17,7 @@
     "@types/react": "^16.7.20",
     "@types/react-dom": "^16.0.11",
     "parcel-bundler": "^1.11.0",
+    "process": "^0.11.10",
     "rimraf": "^2.6.3",
     "sass": "^1.16.1",
     "typescript": "^3.2.4"
