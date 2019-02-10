@@ -1,6 +1,6 @@
-import * as React from "react";
+import * as React from 'react';
 
-import { DisableButton } from "./components";
+import { DisableButton } from './components';
 
 const Dashboard = () => {
   return <DisableButton />;

@@ -1,6 +1,6 @@
-import * as React from "react";
+import * as React from 'react';
 
-import { env } from "../../../config";
+import { env } from '../../../config';
 
 class DisableButton extends React.Component<{}, { socket: WebSocket }> {
   state = { socket: new WebSocket(env.webSocketUrl) };
@@ -18,13 +18,13 @@ class DisableButton extends React.Component<{}, { socket: WebSocket }> {
           const { socket } = this.state;
 
           if (socket.readyState == socket.OPEN) {
-            this.state.socket.send("deactivate");
+            this.state.socket.send('deactivate');
             clearInterval(interval);
           }
         }, 50);
       });
     } else {
-      socket.send("deactivate");
+      socket.send('deactivate');
     }
   };
 
