@@ -5,6 +5,9 @@
  * Date: September 15, 2018
  */
 
+ // Prevents device from automatically trying to connect to the particle cloud.
+ SYSTEM_MODE(MANUAL);
+
 #include "Spark-Websockets.h"
 
 WebSocketClient client;
