@@ -6,9 +6,10 @@
  */
 
 // Prevents device from automatically trying to connect to the particle cloud.
- SYSTEM_MODE(MANUAL);
+SYSTEM_MODE(MANUAL);
 
 #include "Spark-Websockets.h"
+#include <time.h>
 
 WebSocketClient client;
 
@@ -17,6 +18,8 @@ const char* deviceName = "<DEVICE_NAME_HERE>";
 const char* activated = "activated ";
 const char* deactivated = "deactivated ";
 const int buzzer = D7;
+
+time_t lastDing = time(NULL);
 
 void onMessage (WebSocketClient client, char* message) {
   char* command;
@@ -45,6 +48,10 @@ void onMessage (WebSocketClient client, char* message) {
 
     client.send(newMessage);
 
+  } else if (strcmp(command, "ding") == 0) {
+
+    lastDing = time(NULL);
+
   }
 }
 
@@ -57,5 +64,10 @@ void setup() {
 }
 
 void loop() {
+  if (difftime(lastDing, time(NULL)) > (5 * 60)) {
+    // Restart device since we haven't heard from the server in over 5 minutes.
+    System.reset();
+  }
+
   client.monitor();
 }

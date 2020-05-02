@@ -68,6 +68,10 @@
           socket.send("deactivated " + color);
         }
 
+        if (action === "identify") {
+          socket.send("identity " + color);
+        }
+
         console.log("Message from the server ", event.data);
       });
 

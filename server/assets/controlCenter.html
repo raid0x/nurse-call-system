@@ -88,6 +88,10 @@
           document.getElementById("white").classList.remove("on");
         }
 
+        if (action === "identify") {
+          socket.send("identity control");
+        }
+
         console.log("Message from the server ", event.data);
       });
 

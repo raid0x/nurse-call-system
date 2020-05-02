@@ -7,39 +7,54 @@ import { schedule } from "../schedule";
 let delayedDispatchIDs: NodeJS.Timeout[] = [];
 
 function handleWebSockets(wss: WebSocket.Server): (w: WebSocket) => void {
-  return function(ws: WebSocket) {
-    console.log("A new user connected");
+    return function(ws: WebSocket) {
+      ws.send("identify");
+      let identity = "new user";
+      console.log("A new user connected");
 
-    ws.on("message", function(message: string) {
-      console.log("Message recieved: " + JSON.stringify(message));
+      let dinger = setInterval(() => {
+        ws.send("ding");
+      }, 30 * 1000);
 
-      if (message == "deactivate") {
-        delayedDispatchIDs.forEach(timerID => clearTimeout(timerID));
-        delayedDispatchIDs = [];
-      }
+      ws.on("message", function(message: string) {
+        console.log(identity + " - Message recieved: " + JSON.stringify(message));
+        
+        const [ command, device ] = message.split(" ");
 
-      const { dispatches, delayedDispatches }: Dispatch = generateDispatches(
-        schedule,
-        new Date(),
-        message
-      );
+        if (command === "identity") {
+          identity = device;
+          console.log('new user identified as ' + identity);
+          return;
+        }
 
-      dispatches.forEach(dispatch => {
-        sendDispatchToClient(wss, ws, dispatch);
-      });
+        if (message == "deactivate") {
+          delayedDispatchIDs.forEach(timerID => clearTimeout(timerID));
+          delayedDispatchIDs = [];
+        }
 
-      delayedDispatches.forEach(({ dispatch, delay }) => {
-        const timerID = setTimeout(function() {
+        const { dispatches, delayedDispatches }: Dispatch = generateDispatches(
+          schedule,
+          new Date(),
+          message
+        );
+
+        dispatches.forEach(dispatch => {
           sendDispatchToClient(wss, ws, dispatch);
-        }, delay);
+        });
 
-        delayedDispatchIDs.push(timerID);
+        delayedDispatches.forEach(({ dispatch, delay }) => {
+          const timerID = setTimeout(function() {
+            sendDispatchToClient(wss, ws, dispatch);
+          }, delay);
+
+          delayedDispatchIDs.push(timerID);
+        });
       });
-    });
 
-    ws.on("close", function() {
-      console.log("A user disconnected.");
-    });
+      ws.on("close", function() {
+        console.log(identity + " disconnected.");
+        clearInterval(dinger);
+      });
   };
 }
 

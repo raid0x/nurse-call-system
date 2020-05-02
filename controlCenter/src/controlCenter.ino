@@ -5,8 +5,8 @@
  * Date: September 15, 2018
  */
 
- // Prevents device from automatically trying to connect to the particle cloud.
- SYSTEM_MODE(MANUAL);
+// Prevents device from automatically trying to connect to the particle cloud.
+SYSTEM_MODE(MANUAL);
 
 #include "Spark-Websockets.h"
 
@@ -30,6 +30,8 @@ bool redButtonPressed = false;
 bool greenButtonPressed = false;
 bool blueButtonPressed = false;
 bool whiteButtonPressed = false;
+
+time_t lastDing = time(NULL);
 
 void activated(char* device, uint8_t state = HIGH) {
   if (strcmp(device ,"red") == 0) {
@@ -57,6 +59,8 @@ void onMessage (WebSocketClient client, char* message) {
     activated(device);
   } else if (strcmp(command, "deactivated") == 0) {
     deactivated(device);
+  } else if (strcmp(command, "ding") == 0) {
+    lastDing = time(NULL);
   }
 }
 
@@ -97,6 +101,11 @@ void setup () {
 }
 
 void loop () {
+  if (difftime(lastDing, time(NULL)) > (5 * 60)) {
+    // Restart device since we haven't heard from the server in over 5 minutes.
+    System.reset();
+  }
+
   client.monitor();
 
   if (digitalRead(redButton) == HIGH) {
